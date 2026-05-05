@@ -149,7 +149,7 @@ const servidorTCP = net.createServer((socket) => {
 
       guardarMedicion(medicion);
       verificarAlarmas(medicion);
-      console.log(`[SERVIDOR] Guardado ✓ | Sensor: ${sensorId} | Temp: ${temperatura}°C | Humedad: ${humedad}% | ${medicion.timestamp}`);
+      console.log(`[SERVIDOR] Guardado  | Sensor: ${sensorId} | Temp: ${temperatura}°C | Humedad: ${humedad}% | ${medicion.timestamp}`);
     }
   });
 
