@@ -12,7 +12,7 @@ const net = require('net');
 
 const GATEWAY_PORT = 5000;       // Puerto donde escucha a los sensores
 const SERVER_HOST  = '127.0.0.1';
-const SERVER_PORT  = 6000;       // Puerto del servidor central
+const SERVER_PORT  = 7000;       // Puerto del servidor central
 
 // Conexion persistente al servidor
 let socketServidor = null;

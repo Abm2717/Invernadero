@@ -43,7 +43,7 @@ function conectar() {
       const mensaje = JSON.parse(data);
 
       if (mensaje.tipo === 'confirmacion') {
-        console.log(`[ALARMAS] ✅ ${mensaje.mensaje}`);
+        console.log(`[ALARMAS]  ${mensaje.mensaje}`);
       }
 
       if (mensaje.tipo === 'alarma') {
