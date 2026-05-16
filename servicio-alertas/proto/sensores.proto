@@ -1,0 +1,23 @@
+syntax = "proto3";
+
+package sensores;
+
+service SensorService {
+  rpc ObtenerSensor (SensorRequest) returns (SensorResponse);
+}
+
+message SensorRequest {
+  int32 id = 1;
+}
+
+message SensorResponse {
+  int32 id                  = 1;
+  string nombre             = 2;
+  string ubicacion          = 3;
+  string marca              = 4;
+  string tipo               = 5;
+  float umbralTemperatura   = 6;
+  float umbralHumedad       = 7;
+  bool activo               = 8;
+  bool encontrado           = 9;
+}
