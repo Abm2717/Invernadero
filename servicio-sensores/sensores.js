@@ -16,6 +16,9 @@
  *   ObtenerSensor(id) → devuelve datos del sensor incluyendo umbrales
  */
 
+const dns = require('dns');
+dns.setDefaultResultOrder('ipv4first');
+
 const express    = require('express');
 const cors       = require('cors');
 const grpc       = require('@grpc/grpc-js');
@@ -29,7 +32,7 @@ const GRPC_PORT = 50051;
 // ---------------------------------------------------------
 // Conexión a PostgreSQL
 // ---------------------------------------------------------
-const sequelize = new Sequelize('postgresql://postgres:ItSoN242717_@db.lfezbkxzdwanrvvxqibk.supabase.co:5432/postgres', {
+const sequelize = new Sequelize('postgresql://postgres.lfezbkxzdwanrvvxqibk:ItSoN242717_@aws-1-us-east-1.pooler.supabase.com:6543/postgres', {
   dialect: 'postgres',
   dialectOptions: {
     ssl: { require: true, rejectUnauthorized: false }

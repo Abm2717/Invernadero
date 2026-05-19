@@ -1,0 +1,171 @@
+version: '3.8'
+
+services:
+
+  # ---------------------------------------------------------
+  # RabbitMQ
+  # ---------------------------------------------------------
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    ports:
+      - "5672:5672"   # AMQP
+      - "15672:15672" # Panel de administración
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ---------------------------------------------------------
+  # Keycloak
+  # ---------------------------------------------------------
+  keycloak:
+    image: quay.io/keycloak/keycloak:24.0.0
+    container_name: keycloak
+    ports:
+      - "8080:8080"
+    environment:
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+    command: start-dev
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/realms/master"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  # ---------------------------------------------------------
+  # Servicio TCP Parser
+  # ---------------------------------------------------------
+  servicio-tcp-parser:
+    build: ./servicio-tcp-parser
+    container_name: servicio-tcp-parser
+    ports:
+      - "7000:7000"
+    environment:
+      RABBITMQ_URL: amqp://guest:guest@rabbitmq:5672
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+    restart: unless-stopped
+
+  # ---------------------------------------------------------
+  # Servicio Almacenamiento
+  # ---------------------------------------------------------
+  servicio-almacenamiento:
+    build: ./servicio-almacenamiento
+    container_name: servicio-almacenamiento
+    dns:
+    - 8.8.8.8
+    - 8.8.4.4
+    environment:
+      RABBITMQ_URL: amqp://guest:guest@rabbitmq:5672
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+    restart: unless-stopped
+
+  # ---------------------------------------------------------
+  # Servicio Alertas
+  # ---------------------------------------------------------
+  servicio-alertas:
+    build: ./servicio-alertas
+    container_name: servicio-alertas
+    environment:
+      RABBITMQ_URL: amqp://guest:guest@rabbitmq:5672
+      GRPC_SENSORES: servicio-sensores:50051
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+      servicio-sensores:
+        condition: service_started
+    restart: unless-stopped
+
+  # ---------------------------------------------------------
+  # Servicio Notificaciones
+  # ---------------------------------------------------------
+  servicio-notificaciones:
+    build: ./servicio-notificaciones
+    container_name: servicio-notificaciones
+    ports:
+      - "8002:8002"
+    dns:
+    - 8.8.8.8
+    - 8.8.4.4
+    environment:
+      RABBITMQ_URL: amqp://guest:guest@rabbitmq:5672
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+    restart: unless-stopped
+
+  # ---------------------------------------------------------
+  # Servicio Sensores
+  # ---------------------------------------------------------
+  servicio-sensores:
+    build: ./servicio-sensores
+    container_name: servicio-sensores
+    ports:
+      - "8001:8001"
+      - "50051:50051"
+    dns:
+    - 8.8.8.8
+    - 8.8.4.4
+    restart: unless-stopped
+
+  # ---------------------------------------------------------
+  # API Gateway
+  # ---------------------------------------------------------
+  api-gateway:
+    build: ./api-gateway
+    container_name: api-gateway
+    ports:
+      - "9000:9000"
+    environment:
+      KEYCLOAK_URL: http://keycloak:8080
+    depends_on:
+      - servicio-sensores
+      - servicio-notificaciones
+      - keycloak
+    restart: unless-stopped
+
+  # ---------------------------------------------------------
+  # Nginx Load Balancer
+  # ---------------------------------------------------------
+  nginx:
+    image: nginx:latest
+    container_name: nginx-balancer
+    ports:
+      - "8081:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+    depends_on:
+      - api-gateway   
+      
+    restart: unless-stopped
+
+  # ---------------------------------------------------------
+  # Grafana
+  # ---------------------------------------------------------
+  grafana:
+    image: grafana/grafana:9.5.0
+    platform: linux/amd64
+    container_name: grafana
+    ports:
+      - "3000:3000"
+    environment:
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: admin
+      GF_AUTH_ANONYMOUS_ENABLED: "true"
+      GF_AUTH_ANONYMOUS_ORG_ROLE: Viewer
+      GF_SECURITY_ALLOW_EMBEDDING: "true"
+    volumes:
+      - grafana-data:/var/lib/grafana
+    restart: unless-stopped
+
+volumes:
+  grafana-data:

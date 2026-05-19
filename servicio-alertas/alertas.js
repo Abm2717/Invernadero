@@ -12,11 +12,11 @@ const grpc       = require('@grpc/grpc-js');
 const protoLoader = require('@grpc/proto-loader');
 const path       = require('path');
 
-const RABBITMQ_URL     = 'amqp://localhost';
+const RABBITMQ_URL = process.env.RABBITMQ_URL || 'amqp://localhost';
 const EXCHANGE         = 'invernadero';
 const EXCHANGE_ALERTAS = 'invernadero.alertas';
 const QUEUE            = 'alertas.mediciones';
-const GRPC_SENSORES    = 'localhost:50051';
+const GRPC_SENSORES = process.env.GRPC_SENSORES || 'localhost:50051';
 
 // ---------------------------------------------------------
 // Cliente gRPC hacia Servicio Sensores

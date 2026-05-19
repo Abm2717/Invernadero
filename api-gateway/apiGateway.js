@@ -21,7 +21,7 @@ const HTTP_PORT = 9000;
 // ---------------------------------------------------------
 // Configuración de Keycloak
 // ---------------------------------------------------------
-const KEYCLOAK_URL   = 'http://localhost:8080';
+const KEYCLOAK_URL = process.env.KEYCLOAK_URL || 'http://localhost:8080';
 const REALM          = 'Invernadero';
 const JWKS_URI       = `${KEYCLOAK_URL}/realms/${REALM}/protocol/openid-connect/certs`;
 
@@ -47,8 +47,7 @@ function autenticar(req, res, next) {
   const token = authHeader.split(' ')[1];
 
   jwt.verify(token, obtenerClavePublica, {
-    algorithms: ['RS256'],
-    issuer: `${KEYCLOAK_URL}/realms/${REALM}`
+    algorithms: ['RS256']
   }, (err, decoded) => {
     if (err) {
       console.error(`[GATEWAY] Token inválido: ${err.message} | ${JSON.stringify(err)}`);
@@ -86,7 +85,7 @@ app.use((req, res, next) => {
 // Rutas protegidas con autenticación
 // ---------------------------------------------------------
 app.use('/sensores', autenticar, createProxyMiddleware({
-  target: 'http://localhost:8001/sensores',
+  target: 'http://servicio-sensores:8001/sensores',
   changeOrigin: true,
   proxyTimeout: 10000,
   timeout: 10000,
@@ -105,7 +104,7 @@ app.use('/sensores', autenticar, createProxyMiddleware({
 }));
 
 app.use('/notificaciones', autenticar, createProxyMiddleware({
-  target: 'http://localhost:8002/notificaciones',
+  target: 'http://servicio-notificaciones:8002/notificaciones',
   changeOrigin: true,
   proxyTimeout: 10000,
   timeout: 10000,

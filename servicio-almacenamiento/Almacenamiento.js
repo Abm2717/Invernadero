@@ -8,10 +8,13 @@
  *    → Guardar en tabla notificaciones
  */
 
+const dns = require('dns');
+dns.setDefaultResultOrder('ipv4first');
+
 const amqp      = require('amqplib');
 const { Sequelize, DataTypes } = require('sequelize');
 
-const RABBITMQ_URL     = 'amqp://localhost';
+const RABBITMQ_URL = process.env.RABBITMQ_URL || 'amqp://localhost';
 const EXCHANGE         = 'invernadero';
 const EXCHANGE_ALERTAS = 'invernadero.alertas';
 const QUEUE_MEDICIONES    = 'almacenamiento.mediciones';
@@ -20,13 +23,10 @@ const QUEUE_NOTIFICACIONES = 'almacenamiento.notificaciones';
 // ---------------------------------------------------------
 // Conexión a PostgreSQL
 // ---------------------------------------------------------
-const sequelize = new Sequelize('postgresql://postgres:ItSoN242717_@db.lfezbkxzdwanrvvxqibk.supabase.co:5432/postgres', {
+const sequelize = new Sequelize('postgresql://postgres.lfezbkxzdwanrvvxqibk:ItSoN242717_@aws-1-us-east-1.pooler.supabase.com:6543/postgres', {
   dialect: 'postgres',
   dialectOptions: {
-    ssl: {
-      require: true,
-      rejectUnauthorized: false
-    }
+    ssl: { require: true, rejectUnauthorized: false }
   },
   logging: false
 });

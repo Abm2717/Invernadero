@@ -14,7 +14,7 @@ const net    = require('net');
 const amqp   = require('amqplib');
 
 const TCP_PORT     = 7000;
-const RABBITMQ_URL = 'amqp://localhost';
+const RABBITMQ_URL = process.env.RABBITMQ_URL || 'amqp://localhost';
 const EXCHANGE     = 'invernadero';
 
 let canal = null;

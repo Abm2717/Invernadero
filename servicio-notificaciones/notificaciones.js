@@ -12,6 +12,9 @@
  *   DELETE /notificaciones/suscripciones/:id   → eliminar suscripción
  */
 
+const dns = require('dns');
+dns.setDefaultResultOrder('ipv4first');
+
 const amqp       = require('amqplib');
 const nodemailer = require('nodemailer');
 const express    = require('express');
@@ -19,14 +22,14 @@ const cors       = require('cors');
 const { Sequelize, DataTypes } = require('sequelize');
 
 const HTTP_PORT        = 8002;
-const RABBITMQ_URL     = 'amqp://localhost';
+const RABBITMQ_URL = process.env.RABBITMQ_URL || 'amqp://localhost';
 const EXCHANGE_ALERTAS = 'invernadero.alertas';
 const QUEUE            = 'notificaciones.alertas';
 
 // ---------------------------------------------------------
 // Conexión a PostgreSQL
 // ---------------------------------------------------------
-const sequelize = new Sequelize('postgresql://postgres:ItSoN242717_@db.lfezbkxzdwanrvvxqibk.supabase.co:5432/postgres', {
+const sequelize = new Sequelize('postgresql://postgres.lfezbkxzdwanrvvxqibk:ItSoN242717_@aws-1-us-east-1.pooler.supabase.com:6543/postgres', {
   dialect: 'postgres',
   dialectOptions: {
     ssl: { require: true, rejectUnauthorized: false }
