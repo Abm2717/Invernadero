@@ -16,7 +16,7 @@
 
       <div class="grafana-container">
         <iframe
-          src="http://localhost:3000/d/ae2f8aa3-f61c-4181-8cd5-e1da0687fa13/dashboard-invernadero?orgId=1&refresh=10s&theme=dark"
+          :src="`http://${host}:3000/d/ae2f8aa3-f61c-4181-8cd5-e1da0687fa13/dashboard-invernadero?orgId=1&refresh=10s&theme=dark`"
           width="140%"
           height="1400"
           frameborder="0"
@@ -29,6 +29,11 @@
 <script>
 export default {
   name: 'DashboardView',
+  data() {
+    return {
+      host: window.location.hostname
+    }
+  },
   methods: {
     logout() {
       localStorage.removeItem('token')

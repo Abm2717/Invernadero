@@ -95,7 +95,8 @@
 <script>
 import axios from 'axios'
 
-const API = 'http://localhost:8081/sensores'
+const BASE = `http://${window.location.hostname}:8081`
+const API = `${BASE}/sensores`
 
 export default {
   name: 'SensoresView',

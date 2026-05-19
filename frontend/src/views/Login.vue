@@ -46,13 +46,13 @@ export default {
         const params = new URLSearchParams()
         params.append('grant_type', 'password')
         params.append('client_id', 'api-gateway')
-        params.append('client_secret', 'Gv6BaZ32LR4TierYTZHEVpk8FYWk8ayI')
+        params.append('client_secret', 'nRbuJ9bxr2Acgb0XyqY5iaviqhDooIn1')
         params.append('username', this.username)
         params.append('password', this.password)
 
         const response = await axios.post(
-        'http://192.168.1.69:8080/realms/Invernadero/protocol/openid-connect/token',
-        params
+          `http://${window.location.hostname}:8080/realms/Invernadero/protocol/openid-connect/token`,
+          params
         )
 
         localStorage.setItem('token', response.data.access_token)
